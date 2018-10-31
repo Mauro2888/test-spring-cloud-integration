@@ -3,11 +3,13 @@ package com.test.integration.spring.testspringcloudintegration;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Logger;
 
 @Component
 public class CamelRoute extends RouteBuilder {
@@ -32,18 +34,25 @@ public class CamelRoute extends RouteBuilder {
 
     };
 
+    private Processor setSplitName = exchange -> {
+        String timeStamp = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+        String fileName = "Split_Test_File_"+ timeStamp + ".xml";
+        exchange.getIn().setHeader("CamelFileName",fileName);
+    };
+
     @Override
     public void configure() throws Exception {
         from("{{test.integration.inputlocal}}")
                 .choice()
                 .when(header(Exchange.FILE_NAME_CONSUMED).endsWith(".txt"))
                     .to("direct:TxtRoute")
-                .when(header(Exchange.FILE_NAME_CONSUMED).endsWith(".xml"))
+                .when(header(Exchange.FILE_NAME_CONSUMED).contains("MAPPED"))
                     .to("direct:XmlRoute")
+                .when(header(Exchange.FILE_NAME_CONSUMED).contains("AP"))
+                    .to("direct:XmlSplitRoute")
                 .otherwise()
                     .to("direct:OthersFilesRoute")
                 .end();
-
 
         from("direct:XmlRoute")
                 .log("Start validator")
@@ -59,6 +68,13 @@ public class CamelRoute extends RouteBuilder {
                 .process(setNameTxt)
                 .log("Sending to Txt folder")
                 .to("{{test.integration.outputlocalTxt}}");
+
+        from("direct:XmlSplitRoute")
+                .split().tokenizeXML(splitName)
+                .log("Splitting")
+                .process(setSplitName)
+                .to("{{test.integration.outputlocalSplit}}");
+
 
         from("direct:OthersFilesRoute")
                 .to("{{test.integration.outputOthersFiles}}");
