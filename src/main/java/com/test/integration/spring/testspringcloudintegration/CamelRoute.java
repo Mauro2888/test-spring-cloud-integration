@@ -13,7 +13,7 @@ import java.util.Date;
 public class CamelRoute extends RouteBuilder {
 
     @Value("${valore}")
-    String splitName = "valore";
+    private String splitName;
 
     @Autowired
     MappingProcessor mappingProcessor;
