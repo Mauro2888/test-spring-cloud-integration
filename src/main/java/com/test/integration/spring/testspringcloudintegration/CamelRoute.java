@@ -6,10 +6,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Logger;
 
 @Component
 public class CamelRoute extends RouteBuilder {
@@ -17,19 +15,20 @@ public class CamelRoute extends RouteBuilder {
     @Value("${valore}")
     String splitName = "valore";
 
-    MappingProcessor mappingProcessor = new MappingProcessor();
+    @Autowired
+    MappingProcessor mappingProcessor;
 
     private Processor setNameXml = exchange -> {
         String timeStamp = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
         String fileName = "Test_XML_" + timeStamp + ".xml";
-        System.out.println("XML");
+        System.out.println("Route XML");
         exchange.getIn().setHeader("CamelFileName",fileName);
     };
 
     private Processor setNameTxt = exchange -> {
       String timeStamp = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
       String fileName = "Test_TXT_" + timeStamp + ".txt";
-        System.out.println("TXT");
+        System.out.println("Route TXT");
       exchange.getIn().setHeader("CamelFileName",fileName);
 
     };
@@ -37,6 +36,7 @@ public class CamelRoute extends RouteBuilder {
     private Processor setSplitName = exchange -> {
         String timeStamp = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
         String fileName = "Split_Test_File_"+ timeStamp + ".xml";
+        System.out.println("Route SPLIT");
         exchange.getIn().setHeader("CamelFileName",fileName);
     };
 

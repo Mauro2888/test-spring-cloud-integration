@@ -4,8 +4,10 @@ import com.altova.io.StringInput;
 import com.altova.io.StringOutput;
 import com.test.integration.spring.testspringcloudintegration.Mapping.MappingMapToOutput;
 import org.apache.camel.Body;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class MappingProcessor {
 
     public String mapping(@Body String exchange){
