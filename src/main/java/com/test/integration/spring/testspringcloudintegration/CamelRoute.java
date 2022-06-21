@@ -42,6 +42,7 @@ public class CamelRoute extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+        //test da sftp ("sftp://user@myhost//home/data?password=secret");
         from("{{test.integration.inputlocal}}")
                 .choice()
                 .when(header(Exchange.FILE_NAME_CONSUMED).endsWith(".txt"))
